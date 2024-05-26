@@ -1,0 +1,52 @@
+[
+    {
+        "Repository": "QL-Software-Development/Clive.TestTracking",
+        "Nr_pr": 0,
+        "Nr_APPROVED": 0,
+        "Nr_CHANGES_REQUESTED": 0,
+        "Acceptance_Rate": 100.0,
+        "Rejection_Rate": 0.0,
+        "Average_Time": 0,
+        "Nr_REVIEW_REQUIRED": 2
+    },
+    {
+        "Repository": "QL-Software-Development/clive-test-tracking-ux",
+        "Nr_pr": 2,
+        "Nr_APPROVED": 2,
+        "Nr_CHANGES_REQUESTED": 0,
+        "Acceptance_Rate": 100.0,
+        "Rejection_Rate": 0.0,
+        "Average_Time": 0.0,
+        "Nr_REVIEW_REQUIRED": 5
+    },
+    {
+        "Repository": "QL-Software-Development/CLIVE.QLP.Provider",
+        "Nr_pr": 1,
+        "Nr_APPROVED": 1,
+        "Nr_CHANGES_REQUESTED": 0,
+        "Acceptance_Rate": 100.0,
+        "Rejection_Rate": 0.0,
+        "Average_Time": 0.0,
+        "Nr_REVIEW_REQUIRED": 4
+    },
+    {
+        "Repository": "QL-Software-Development/CliveQlp",
+        "Nr_pr": 0,
+        "Nr_APPROVED": 0,
+        "Nr_CHANGES_REQUESTED": 0,
+        "Acceptance_Rate": 100.0,
+        "Rejection_Rate": 0.0,
+        "Average_Time": 0,
+        "Nr_REVIEW_REQUIRED": 5
+    },
+    {
+        "Repository": "QL-Software-Development/clive-documents",
+        "Nr_pr": 0,
+        "Nr_APPROVED": 0,
+        "Nr_CHANGES_REQUESTED": 0,
+        "Acceptance_Rate": 0,
+        "Rejection_Rate": 0,
+        "Average_Time": 0,
+        "Nr_REVIEW_REQUIRED": 0
+    }
+]

@@ -35,14 +35,26 @@ def calculate_pr_statistics_open(repository, state, page,  access_token):
                 
                 if response.status_code == 200:
                     reviews = response.json()
+                    last_modification_date = datetime.strptime(pr["updated_at"], "%Y-%m-%dT%H:%M:%SZ")
+                    last_review_date = None
                     if reviews:
                         change_requested_reviews = get_review_count(reviews, 'CHANGES_REQUESTED')
                         approved_reviews = get_review_count(reviews, 'APPROVED')
 
-                        if change_requested_reviews:
-                            pr_with_change_requests += 1
-                        if approved_reviews:
-                            pr_approved += 1
+                        last_review = max(reviews, key=lambda x: datetime.strptime(x["submitted_at"], "%Y-%m-%dT%H:%M:%SZ"))
+                        last_review_date = datetime.strptime(last_review["submitted_at"], "%Y-%m-%dT%H:%M:%SZ")
+
+                        if last_modification_date > last_review_date:
+                            print(f"PR #{pr_number} requires a new review")
+                            pr_without_reviews += 1
+                        else:
+                            
+                            if change_requested_reviews:
+                                pr_with_change_requests += 1
+                            elif approved_reviews:
+                                pr_approved += 1
+                            print(f"PR #{pr_number}: Changes Requested - {len(change_requested_reviews)}, Approved - {len(approved_reviews)}")        
+
                     else:
                         pr_without_reviews += 1
                 else:

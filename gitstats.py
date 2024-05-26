@@ -1,7 +1,9 @@
 from calcul_more_pages_close import calculate_more_pages_close
 from calcul_more_pages_open import calculate_more_pages_open
 from calcul_more_pages_all import calculate_more_pages_all
-
+import json
+from models import RepoStats
+from models import AllReposStats
 
 repository = {"QL-Software-Development/clive-test-tracking-ux", 
               "QL-Software-Development/CliveQlp", 
@@ -29,6 +31,9 @@ total_review_req_all =0
 total_prs_all_approved=0
 total_prs_all_changes_requested=0
 total_time_prs_avg_all=0
+
+all_repo_stats = []
+
 
 for state in state_filter:
     if state == "close":
@@ -73,40 +78,34 @@ for state in state_filter:
     
     elif state == "all":
         for repo in repository:
-            totalAll, total_pr_approved_all, total_pr_with_change_requests_all, acceptance_rate, rejection_rate, avg_time, total_pr_without_reviews_all= calculate_more_pages_all(repo, state, access_token)
-
+            totalAll, total_approved, total_changes_requested, acceptance_rate, rejection_rate, avg_time, total_no_action = calculate_more_pages_all(repo, state, access_token)
 
             total_prs_all += totalAll
-            total_prs_all_approved += total_pr_approved_all
-            total_prs_all_changes_requested += total_pr_with_change_requests_all
-            total_review_req_all += total_pr_without_reviews_all
+            total_prs_all_approved += total_approved
+            total_prs_all_changes_requested += total_changes_requested
+            total_review_req_all += total_no_action
+
+            repo_stats = RepoStats(repo, totalAll, total_approved, total_changes_requested, acceptance_rate, rejection_rate, avg_time, total_no_action)
+            repo_dict = repo_stats.to_dict()
+            all_repo_stats.append(repo_dict)
+            
+        print("-" * 30)    
+        print(f"State: {state}")
 
 
-            print(f"State: {state}")
-            print(f"Repository: {repo}")
-            print(f"Number of PR excluding review req: {totalAll}")
-            print(f"Number of PRs with status APPROVED: {total_pr_approved_all}")
-            print(f"Number of PRs with status CHANGES_REQUESTED: {total_pr_with_change_requests_all}")
-            print(f"Acceptance Rate: {acceptance_rate:.2f}%")
-            print(f"Rejection Rate: {rejection_rate:.2f}%")
-            print(f"Average Time: {avg_time:.2f} days")
-            print(f"Number of PRs with status REVIEW_REQUIRED: {total_pr_without_reviews_all}")
-            print("-" * 30)
+        json_string = json.dumps(all_repo_stats, indent=4)
+        print(json_string)
             
             
     acceptance_rate_AllState = (total_prs_all_approved / total_prs_all * 100) if total_prs_all > 0 else 0
     rejection_rate_AllState = (total_prs_all_changes_requested / total_prs_all * 100) if total_prs_all > 0 else 0
     
-print("-" * 30)
-print(f"Total PRs excluding review req: {total_prs_all}")
-print(f"Accepted PRs : {total_prs_all_approved}")
-print(f"Rejected PRs : {total_prs_all_changes_requested}")
-print(f"Acceptance Rate: {acceptance_rate_AllState:.2f}%")
-print(f"Rejection Rate : {rejection_rate_AllState:.2f}%")
-print(f"Number of PRs with review required: {total_review_req_all}")
-print("-" * 30)
-print("-" * 30)
 
-# print(f"Total PRs opened excluding review req: {total_prs_open}")
-# print(f"Number of PRs with review required open state: {total_review_req_open}")
-# print("-" * 30)
+print("-" * 30)    
+print("ALL THE REPOS")
+
+all_repos_stats = AllReposStats(total_prs_all, total_prs_all_approved, total_prs_all_changes_requested, acceptance_rate_AllState, rejection_rate_AllState, total_review_req_all)
+json_stats = json.dumps(all_repos_stats.to_dict(), indent=4)
+print(json_stats)
+
+print("-" * 30)    
