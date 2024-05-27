@@ -1,111 +1,152 @@
-from calcul_more_pages_close import calculate_more_pages_close
-from calcul_more_pages_open import calculate_more_pages_open
-from calcul_more_pages_all import calculate_more_pages_all
-import json
-from models import RepoStats
-from models import AllReposStats
+from data_processor.calcul_more_pages_close import calculate_more_pages_close
+from data_processor.calcul_more_pages_open import calculate_more_pages_open
+from data_processor.calcul_more_pages_all import calculate_more_pages_all
+from models.models import ClosedPrStats, OpenedPrStats, AllPrStats, ChangeRequestedPr
 
-repository = {"QL-Software-Development/clive-test-tracking-ux", 
-              "QL-Software-Development/CliveQlp", 
-              "QL-Software-Development/CLIVE.QLP.Provider", 
-              "QL-Software-Development/clive-documents", 
-              "QL-Software-Development/Clive.TestTracking"
-              }
 
-access_token = "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" 
+repository = {
+    # "QL-Software-Development/clive-test-tracking-ux",
+    # "QL-Software-Development/CliveQlp",
+    # "QL-Software-Development/CLIVE.QLP.Provider",
+    # "QL-Software-Development/clive-documents",
+    # "QL-Software-Development/Clive.TestTracking"
+    "alexiadraghin/RepoTest1", 
+    "alexiadraghin/RepoTest2",
+    "alexiadraghin/RepoTest3",
+    "alexiadraghin/RepoTest4",
+    "alexiadraghin/RepoTest5"
+}
+# access_token = "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"
+access_token = "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"
 
 state_filter = {"close", "open", "all"}
-
-
-total_prs_close=0
-total_review_req_close =0
-total_prs_close_approved=0
-total_prs_close_changes_requested=0
-total_time_prs_avg_close=0
-
-total_prs_open=0
-total_review_req_open =0
-
 total_prs_all=0
 total_review_req_all =0
 total_prs_all_approved=0
 total_prs_all_changes_requested=0
 total_time_prs_avg_all=0
 
-all_repo_stats = []
+def process_closed_prs(repository, access_token, start_date=None, end_date=None):
+    close_repo_stats = []
+    for repo in repository:
+        totalClosed, total_pr_approved_closed, total_pr_with_change_requests_closed, acceptance_rate, rejection_rate, avg_time, total_pr_without_reviews_closed = calculate_more_pages_close(repo, "close", access_token, start_date, end_date)
 
-
-for state in state_filter:
-    if state == "close":
-        for repo in repository:
-            totalClosed, total_pr_approved_closed, total_pr_with_change_requests_closed, acceptance_rate, rejection_rate, avg_time, total_pr_without_reviews_closed= calculate_more_pages_close(repo, state, access_token)
-
-
-            total_prs_close += totalClosed
-            total_prs_close_approved += total_pr_approved_closed
-            total_prs_close_changes_requested += total_pr_with_change_requests_closed
-            total_review_req_close += total_pr_without_reviews_closed
-
-
-            print(f"State: {state}")
-            print(f"Repository: {repo}")
-            print(f"Number of PR excluding review req: {totalClosed}")
-            print(f"Number of PRs with status APPROVED: {total_pr_approved_closed}")
-            print(f"Number of PRs with status CHANGES_REQUESTED: {total_pr_with_change_requests_closed}")
-            print(f"Acceptance Rate: {acceptance_rate:.2f}%")
-            print(f"Rejection Rate: {rejection_rate:.2f}%")
-            print(f"Average Time: {avg_time:.2f} days")
-            print(f"Number of PRs with status REVIEW_REQUIRED: {total_pr_without_reviews_closed}")
-            print("-" * 30)
-            
-            
-    elif state == "open":
-        for repo in repository:
-            total, total_pr_approved, total_pr_with_change_requests , total_pr_without_reviews  = calculate_more_pages_open(repo, state, access_token)
-            
-            total_prs_open += total
-            total_review_req_open += total_pr_without_reviews
+        repo_stats = ClosedPrStats(
+            repo,
+            totalClosed,
+            total_pr_approved_closed,
+            total_pr_with_change_requests_closed,  
+            acceptance_rate,
+            rejection_rate,
+            avg_time,
+            total_pr_without_reviews_closed,
+            start_date, 
+            end_date
+        )
         
-            
-            print(f"State: {state}")
-            print(f"Repository: {repo}")
-            print(f"Number of PR excluding review req: {total}")
-            print(f"Number of PRs with status APPROVED: {total_pr_approved}")
-            print(f"Number of PRs with status CHANGES_REQUESTED: {total_pr_with_change_requests}")
-            print(f"Number of PRs with status REVIEW_REQUIRED: {total_pr_without_reviews}")
-            print("-" * 30)
+        close_repo_stats.append(repo_stats.to_dict())
+    return close_repo_stats
 
-    
-    elif state == "all":
-        for repo in repository:
-            totalAll, total_approved, total_changes_requested, acceptance_rate, rejection_rate, avg_time, total_no_action = calculate_more_pages_all(repo, state, access_token)
+        
+def process_open_prs(repository, access_token,  start_date=None, end_date=None):
+    open_repo_stats = []
 
-            total_prs_all += totalAll
-            total_prs_all_approved += total_approved
-            total_prs_all_changes_requested += total_changes_requested
-            total_review_req_all += total_no_action
+    for repo in repository:
+        total, total_pr_approved, total_pr_with_change_requests, total_pr_without_reviews = calculate_more_pages_open(repo, "open", access_token,  start_date, end_date)
 
-            repo_stats = RepoStats(repo, totalAll, total_approved, total_changes_requested, acceptance_rate, rejection_rate, avg_time, total_no_action)
-            repo_dict = repo_stats.to_dict()
-            all_repo_stats.append(repo_dict)
-            
-        print("-" * 30)    
-        print(f"State: {state}")
+        repo_stats = OpenedPrStats(
+            repo,
+            total, 
+            total_pr_approved, 
+            total_pr_with_change_requests, 
+            total_pr_without_reviews,
+            start_date, 
+            end_date
+        )
+        open_repo_stats.append(repo_stats.to_dict())
+    return open_repo_stats
 
 
-        json_string = json.dumps(all_repo_stats, indent=4)
-        print(json_string)
-            
-            
+def process_all_prs(repository, access_token,  start_date=None, end_date=None):
+    all_repo_stats = []  
+    for repo in repository:
+        totalAll, total_approved, total_changes_requested, acceptance_rate, rejection_rate, avg_time, total_no_action = calculate_more_pages_all(repo, "all", access_token, start_date, end_date)
+
+        repo_stats = AllPrStats(repo, 
+                                totalAll, 
+                                total_approved, 
+                                total_changes_requested, 
+                                acceptance_rate, 
+                                rejection_rate, 
+                                avg_time, 
+                                total_no_action,
+                                start_date, 
+                                end_date)
+        all_repo_stats.append(repo_stats.to_dict())
+
+    return all_repo_stats
+
+def process_all_prs2(repository, access_token,  start_date=None, end_date=None):
+    all_repo_stats = []  
+    total_prs_all = total_review_req_all = total_prs_all_approved = 0
+    total_prs_all_changes_requested = [] 
+    for repo in repository:
+        totalAll, total_approved, pr_changes_requested_details, acceptance_rate, rejection_rate, avg_time, total_no_action = calculate_more_pages_all(repo, "all", access_token,  start_date, end_date)
+
+        total_prs_all += totalAll
+        total_prs_all_approved += total_approved
+        total_review_req_all += total_no_action
+
+        total_prs_all_changes_requested.extend(pr_changes_requested_details) 
+
+        repo_stats = AllPrStats(repo, 
+                                totalAll, 
+                                total_approved, 
+                                pr_changes_requested_details, 
+                                acceptance_rate, 
+                                rejection_rate, 
+                                avg_time, 
+                                total_no_action,
+                                start_date, 
+                                end_date)
+        all_repo_stats.append(repo_stats.to_dict())
+
+    summary_stats = {
+        "total": total_prs_all,
+        "reviewRequired": total_review_req_all,
+        "totalApproved": total_prs_all_approved,
+        "totalRejected": total_prs_all_changes_requested, 
+        "all_repo_stats": all_repo_stats,
+        "startDate": start_date,
+        "endDate" : end_date
+    }
+
+    return summary_stats
+
+def process_for_all_stats(summary_stats):
+    total_prs_all = summary_stats["total"]
+    total_prs_all_approved = summary_stats["totalApproved"]
+    total_prs_all_changes_requested = summary_stats["totalRejected"]  
+    start_date=summary_stats['startDate']
+    end_date=summary_stats['endDate']
+
     acceptance_rate_AllState = (total_prs_all_approved / total_prs_all * 100) if total_prs_all > 0 else 0
-    rejection_rate_AllState = (total_prs_all_changes_requested / total_prs_all * 100) if total_prs_all > 0 else 0
-    
+    rejection_rate_AllState = (len(total_prs_all_changes_requested) / total_prs_all * 100) if total_prs_all > 0 else 0
+    acceptance_rate_AllState = "{:.2f}".format(acceptance_rate_AllState)
+    rejection_rate_AllState = "{:.2f}".format(rejection_rate_AllState)
+    all_repos_stats = {
+        "total": total_prs_all,
+        "totalApproved": total_prs_all_approved,
+        "totalRejected": total_prs_all_changes_requested,  
+        "acceptanceRate": acceptance_rate_AllState,
+        "rejectionRate": rejection_rate_AllState,
+        "reviewRequired": summary_stats["reviewRequired"],
+        "startDate": start_date,
+        "endDate" : end_date
+    }
+    return all_repos_stats
 
-print("-" * 30)    
-print("ALL THE REPOS")
-
-all_repos_stats = AllReposStats(total_prs_all, total_prs_all_approved, total_prs_all_changes_requested, acceptance_rate_AllState, rejection_rate_AllState, total_review_req_all)
-json_stats = json.dumps(all_repos_stats.to_dict(), indent=4)
-print(json_stats)
-
-print("-" * 30)    
+def get_all_repos_stats(start_date=None, end_date=None):
+    summary_stats= process_all_prs2(repository, access_token,  start_date, end_date)
+    all_stats= process_for_all_stats(summary_stats)
+    return all_stats

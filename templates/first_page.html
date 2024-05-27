@@ -1,0 +1,113 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container-fluid">
+    <form id="dateForm" action="/getData" method="get">
+        <div class="row"> 
+            <div class="col-md-6"> 
+                <label>Select Start Date:</label>
+                <div id="datePickerStartDate" class="input-group date">
+                    <input name="start_date" id="datePickerInputStartDate" class="form-control" type="text" value=""/>
+                    <span class="input-group-addon" onclick="openDatePicker('#datePickerStartDate')">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                    </span>
+                </div>
+            </div>
+    
+            <div class="col-md-6"> 
+                <label>Select End Date:</label>
+                <div id="datePickerEndDate" class="input-group date">
+                    <input name="end_date" id="datePickerInputEndDate" class="form-control" type="text" value=""/>
+                    <span class="input-group-addon" onclick="openDatePicker('#datePickerEndDate')">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                    </span>
+                </div>
+            </div> 
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 15px">Get Statistics</button>
+        <div id="loadingPopup" class="modal-loading">
+            <div class="modal-content-loading">
+                <div class="tetrominos">
+                    <div class="tetromino box1"></div>
+                    <div class="tetromino box2"></div>
+                    <div class="tetromino box3"></div>
+                    <div class="tetromino box4"></div>
+                </div>
+                <p>Loading...</p>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+$(function () {
+    $('#datePickerInputStartDate, #datePickerInputEndDate').datepicker({
+        autoclose: true,
+        todayHighlight: true,
+        todayBtn: "linked",
+        format: 'dd-mm-yyyy'
+    }).on('changeDate', function(ev) {
+        $(this).datepicker('hide');
+    });
+
+    if ($('#datePickerInputStartDate').val()) {
+        $('#datePickerInputStartDate').datepicker('update', $('#datePickerInputStartDate').val());
+    }
+    if ($('#datePickerInputEndDate').val()) {
+        $('#datePickerInputEndDate').datepicker('update', $('#datePickerInputEndDate').val());
+    }
+});
+
+function backFourteenDays(currentDate) {
+    var date = new Date(currentDate); // Creează un nou obiect Date pentru a nu modifica data originală
+    date.setDate(date.getDate() - 14); // Scade 14 zile din data curentă
+    return date;
+}
+
+//functie de initializare
+$(function () {
+    
+    $('#datePickerInputStartDate').datepicker({
+        autoclose: true, 
+        todayHighlight: true, 
+        todayBtn : "linked",
+        format: 'dd-mm-yyyy',
+    }).datepicker('update', backFourteenDays(new Date()));    
+
+    $('#datePickerInputEndDate').datepicker({
+        autoclose: true, 
+        todayHighlight: true, 
+        todayBtn : "linked", 
+        format: 'dd-mm-yyyy',
+    }).datepicker('update', new Date());
+});
+
+function openDatePicker(element){
+    $(element).datepicker({
+        autoclose: true, 
+        todayHighlight: true, 
+        todayBtn : "linked", 
+        format: 'dd-mm-yyyy',
+    });
+}
+
+
+// Show loading animation
+function showLoadingAnimation() {
+    document.getElementById('loadingPopup').style.display = 'block';
+}
+
+// Hide loading animation
+function hideLoadingAnimation() {
+    document.getElementById('loadingPopup').style.display = 'none';
+}
+
+// Handle form submission
+document.getElementById('dateForm').addEventListener('submit', function(event) {
+    showLoadingAnimation();
+});
+
+</script>
+{% endblock %}

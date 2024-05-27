@@ -1,0 +1,418 @@
+html, body{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    background-image: url("../img/cover.jpg");
+}
+
+
+.navbar {
+  display: flex; /* folosește flexbox pentru navbar */
+  background-image: url("../img/nav_cover.jpg"); /* Aplică imaginea direct aici */
+  background-size: cover; /* Ajustează imaginea pentru a acoperi tot nav-ul */
+  background-repeat: no-repeat; /* Asigură-te că imaginea nu se repetă */
+  background-position: center; /* Centrează imaginea */
+  height: 150px;
+  width: 100%;
+}
+
+.navbar-brand {
+  display: flex; 
+  align-items: center;
+  margin-right: auto; /* împinge orice alte elemente ale navbar-ului spre dreapta */
+  padding-left: 10px;
+}
+
+.nav-title {
+  font-size: 50px;
+  margin-left: 20px; /* Elimină orice spațiu implicit din stânga titlului */
+  color: rgb(252, 246, 246); 
+}
+
+.background-filter {
+    opacity: 2;
+    z-index: -1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.row {
+    display: flex;
+    align-items: center; 
+}
+
+
+.wrapper {
+    flex: 1 0;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+}
+
+.container {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.header {
+    flex: 0 1;
+}
+
+.content {
+    flex: 1 0; 
+}
+
+@media (min-width: 992px) {
+    .container {
+        width: 970px;
+    }
+}
+
+h1 {
+    font-size: 36pt;
+    color: #080847;
+    line-height: 1.2;
+    margin: 0;
+    font-weight: normal;
+    text-align: center;
+}
+
+p {
+    font-size: 18px;
+    line-height: 1.6;
+    color: rgb(6, 23, 40);
+}
+
+footer {
+    margin-top: 60px;
+    text-align: right;
+    color: #c57979;
+}
+
+th, td {
+    border: 1px solid black;
+    border-radius: 10px;
+  }
+
+  .text-border {
+    font-weight: bold;
+    border: 1px solid black;
+    padding: 10px; 
+    border-radius: 4px;
+    margin-bottom: 10px; 
+}
+.divider {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background-color:#100117db;
+    display: inline-block;
+    height: 3px;
+    width: 100%;
+    border-radius: 10px;
+}
+
+.filter-buttons {
+    margin-bottom: 20px;
+}
+
+
+.filter-buttons .btn-dark:hover {
+    background-color: #9c9999; 
+    border-color: #9c9999;
+}
+
+.clicked {
+    background-color: #9c9999; /* Culoarea de fundal pentru butonul activ */
+    border-color: #9c9999; /* Culoarea bordurii pentru butonul activ */
+    color: white; /* Schimbă culoarea textului, dacă este necesar */
+}
+
+.navbar-brand {
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+}
+
+.navbar-brand h1 {
+    margin: 0; 
+}
+
+.stats-container {
+    width: 60%; /* sau o altă valoare care se potrivește */
+    float: right; /* Opțional, pentru a-l împinge spre dreapta */
+}
+
+.modal-loading {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content-loading {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%;
+  text-align: center;
+}
+.datepicker-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 20px; /* sau orice altă valoare care să creeze spațiul dorit */
+}
+
+.datepicker-column {
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+    flex: 1; /* Acest lucru asigură că ambele coloane sunt egale și se extind corespunzător */
+}
+
+@media (min-width: 768px) {
+    .datepicker-column {
+        flex-basis: 50%; /* Ajustează acest procentaj dacă este necesar */
+    }
+}
+
+.input-group.date {
+    width: 100%; /* Asigură-te că input-group-ul ocupă întreaga lățime a coloanei */
+}
+
+
+/*load animation styles*/
+.tetrominos {
+    position: relative; /* sau 'absolute' dacă este necesar, depinde de layout-ul tău */
+    top: 20px; /* Ajustează conform nevoilor pentru a muta în jos sub butoane */
+    left: 50%; /* Centrarea orizontală */
+    transform: translate(-50%, 0); /* Centrare și scalare */
+    width: 200px; /* Lățimea containerului inițial înainte de scalare */
+    height: 122px; /* noua înălțime a containerului animației */
+    display: flex; /* Folosit pentru a alinia interiorul */
+    justify-content: center; /* Centrarea orizontală a elementelor interioare */
+    align-items: center; /* Centrarea verticală a elementelor interioare */
+    color: #35084e;
+}
+
+.tetrominos2 {
+    position: relative; /* sau 'absolute' dacă este necesar, depinde de layout-ul tău */
+    top: 20px; /* Ajustează conform nevoilor pentru a muta în jos sub butoane */
+    left: 50%; /* Centrarea orizontală */
+    transform: translate(-50%, 0); /* Centrare și scalare */
+    width: 200px; /* Lățimea containerului inițial înainte de scalare */
+    height: 122px; /* noua înălțime a containerului animației */
+    display: flex; /* Folosit pentru a alinia interiorul */
+    justify-content: center; /* Centrarea orizontală a elementelor interioare */
+    align-items: center; /* Centrarea verticală a elementelor interioare */
+    color: #35084e;
+}
+  
+  .tetromino {
+    width: 24px; /* Lățimea inițială a blocului înainte de scalare */
+    height: 28px; /* Înălțimea inițială a blocului înainte de scalare */
+    position: absolute;
+    transition: all ease 0.3s;
+    color: #35084e;
+
+    background: url('data:image/svg+xml;utf-8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 684"%3E%3Cpath fill="%23010101" d="M305.7 0L0 170.9v342.3L305.7 684 612 513.2V170.9L305.7 0z"/%3E%3Cpath fill="%23fff" d="M305.7 80.1l-233.6 131 233.6 131 234.2-131-234.2-131"/%3E%3C/svg%3E') no-repeat top center;
+  }
+  
+  .box1 {
+    -webkit-animation: tetromino1 1.5s ease-out infinite;
+            animation: tetromino1 1.5s ease-out infinite;
+  }
+  
+  .box2 {
+    -webkit-animation: tetromino2 1.5s ease-out infinite;
+            animation: tetromino2 1.5s ease-out infinite;
+  }
+  
+  .box3 {
+    -webkit-animation: tetromino3 1.5s ease-out infinite;
+            animation: tetromino3 1.5s ease-out infinite;
+    z-index: 2;
+  }
+  
+  .box4 {
+    -webkit-animation: tetromino4 1.5s ease-out infinite;
+            animation: tetromino4 1.5s ease-out infinite;
+  }
+  
+  @-webkit-keyframes tetromino1 {
+    0%, 40% {
+      /* compose logo */
+      /* 1 on 3 */
+      /* L-shape */
+      transform: translate(0, 0);
+    }
+    50% {
+      /* pre-box */
+      transform: translate(12px, -6.75px);
+    }
+    60%, 100% {
+      /* box */
+      /* compose logo */
+      transform: translate(24px, 0);
+    }
+  }
+  
+  @keyframes tetromino1 {
+    0%, 40% {
+      /* compose logo */
+      /* 1 on 3 */
+      /* L-shape */
+      transform: translate(0, 0);
+    }
+    50% {
+      /* pre-box */
+      transform: translate(12px, -6.75px);
+    }
+    60%, 100% {
+      /* box */
+      /* compose logo */
+      transform: translate(24px, 0);
+    }
+  }
+  @-webkit-keyframes tetromino2 {
+    0%, 20% {
+      /* compose logo */
+      /* 1 on 3 */
+      transform: translate(24px, 0px);
+    }
+    40%, 100% {
+      /* L-shape */
+      /* box */
+      /* compose logo */
+      transform: translate(36px, 6.75px);
+    }
+  }
+  @keyframes tetromino2 {
+    0%, 20% {
+      /* compose logo */
+      /* 1 on 3 */
+      transform: translate(24px, 0px);
+    }
+    40%, 100% {
+      /* L-shape */
+      /* box */
+      /* compose logo */
+      transform: translate(36px, 6.75px);
+    }
+  }
+  @-webkit-keyframes tetromino3 {
+    0% {
+      /* compose logo */
+      transform: translate(36px, 6.75px);
+    }
+    20%, 60% {
+      /* 1 on 3 */
+      /* L-shape */
+      /* box */
+      transform: translate(24px, 13.5px);
+    }
+    90%, 100% {
+      /* compose logo */
+      transform: translate(12px, 6.75px);
+    }
+  }
+  @keyframes tetromino3 {
+    0% {
+      /* compose logo */
+      transform: translate(36px, 6.75px);
+    }
+    20%, 60% {
+      /* 1 on 3 */
+      /* L-shape */
+      /* box */
+      transform: translate(24px, 13.5px);
+    }
+    90%, 100% {
+      /* compose logo */
+      transform: translate(12px, 6.75px);
+    }
+  }
+  @-webkit-keyframes tetromino4 {
+    0%, 60% {
+      /* compose logo */
+      /* 1 on 3 */
+      /* L-shape */
+      /* box */
+      transform: translate(12px, 6.75px);
+    }
+    90%, 100% {
+      /* compose logo */
+      transform: translate(0, 0);
+    }
+  }
+  @keyframes tetromino4 {
+    0%, 60% {
+      /* compose logo */
+      /* 1 on 3 */
+      /* L-shape */
+      /* box */
+      transform: translate(12px, 6.75px);
+    }
+    90%, 100% {
+      /* compose logo */
+      transform: translate(0, 0);
+    }
+  }
+
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+  }
+  
+  /* The Close Button */
+  .exit {
+    color: #aaaaaa;
+    float: right;
+    font-size: 40px;
+    font-weight: bold;
+  }
+  
+  .exit:hover,
+  .exit:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }

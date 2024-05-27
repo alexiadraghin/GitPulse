@@ -1,0 +1,428 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container-fluid">
+    <form id="dateForm" action="/getData" method="get">
+        <div class="row"> 
+            <div class="col-md-6"> 
+                <label>Select Start Date:</label>
+                <div id="datePickerStartDate" class="input-group date">
+                    <input name="start_date" id="datePickerInputStartDate" class="form-control" type="text" value=""/>
+                    <span class="input-group-addon" onclick="openDatePicker('#datePickerStartDate')">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                    </span>
+                </div>
+            </div>
+    
+            <div class="col-md-6"> 
+                <label>Select End Date:</label>
+                <div id="datePickerEndDate" class="input-group date">
+                    <input name="end_date" id="datePickerInputEndDate" class="form-control" type="text" value=""/>
+                    <span class="input-group-addon" onclick="openDatePicker('#datePickerEndDate')">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                    </span>
+                </div>
+            </div> 
+        </div>
+        <button type="submit" class="btn btn-primary">Get Statistics</button>
+    </form>
+      
+        <div class="divider" ></div>  
+        <div class="row justify-content-center">
+
+            <div class="col-md-4">
+                <div id="pie-chart" style="width: 100%; height: 500px; float: left;"></div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="stats-container">
+
+                    <h2 style="font-size:20px;">Statistics for All Repositories</h2>
+                    <p style="font-size:15px;"><b>Total PRs:</b> {{ all_repos_data.total or '0' }}</p>
+                    <p style="font-size:15px;"><b>PRs Approved</b>: {{ all_repos_data.totalApproved or '0' }}</p>
+                    <p style="font-size:15px;"><b>PRs with Changes Requested</b>: 
+                        {% if all_repos_data.totalRejected %}
+                            <ul>
+                            {% for pr in all_repos_data.totalRejected %}
+                                <li style="font-size:15px;"><b>PR Number:</b> #{{ pr.prNumber }} - <b> Changes Requested Count: </b>{{ pr.changesRequestedCount }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            0
+                        {% endif %}
+                    </p>
+        
+                    <p style="font-size:15px;"><b>Acceptance Rate</b>: {{ all_repos_data.acceptanceRate or '0' }}% </p>  
+                    <p style="font-size:15px;"><b>Rejection Rate</b>: {{ all_repos_data.rejectionRate or '0' }}%</p>
+                    <p style="font-size:15px;"><b>PRs with Review Required</b>: {{ all_repos_data.reviewRequired or '0' }}</p>
+
+                </div>
+            </div>
+        </div>
+
+    <div class="divider" ></div> 
+
+    <div class="filter-buttons">
+        <button type="button" class="btn btn-dark" id="close-btn">CLOSE</button>
+        <button type="button" class="btn btn-dark" id="open-btn">OPEN</button>
+        <button type="button" class="btn btn-dark" id="all-btn">ALL</button>
+    </div>
+    <div class='tetrominos' style='display: none;'> <!-- Inițial ascunse -->
+        <div class='tetromino box1'></div>
+        <div class='tetromino box2'></div>
+        <div class='tetromino box3'></div>
+        <div class='tetromino box4'></div>
+    </div>
+    <div id="close-prs-container"></div>
+    <div id="open-prs-container"></div>
+    <div id="all-prs-container"></div>
+
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var myChart = echarts.init(document.getElementById('pie-chart'));
+
+    var option = {
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            bottom: '5%',
+            left: 'center'
+        },
+        series: [
+            {
+                name: 'PR Rates',
+                type: 'pie',
+                radius: '70%',
+                data: [
+                {
+                    value: {{ all_repos_data.acceptanceRate  or 0 }},
+                    name: 'Acceptance Rate',
+                    itemStyle: {
+                        color: 'rgba(0, 0, 255, 0.5)' 
+                    }
+                },
+                {
+                    value: {{ all_repos_data.rejectionRate or 0 }},
+                    name: 'Rejection Rate',
+                    itemStyle: {
+                        color: 'rgba(255, 99, 71, 0.5)' 
+                    }
+                }
+            ],
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                },
+                label: {
+                    color: 'rgba(0, 0, 0, 0.7)' 
+                }
+            }
+        ]
+    };
+
+    myChart.setOption(option);
+});
+function filterPRs(status) {
+    console.log("Filtering PRs: ", status);
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    function triggerCloseButtonAction() {
+        document.getElementById('close-btn').click();
+    }
+
+    function clearPRContainers() {
+        document.getElementById('close-prs-container').innerHTML = '';
+        document.getElementById('open-prs-container').innerHTML = '';
+        document.getElementById('all-prs-container').innerHTML = '';
+    }
+    function setActiveButton(buttonId) {
+        document.querySelectorAll('.filter-buttons .btn').forEach(function(button) {
+            button.classList.remove('clicked');
+        });
+
+        document.getElementById(buttonId).classList.add('clicked');
+    }
+
+    const buttonsInfo = [
+        {id: 'close-btn', type: 'close'},
+        {id: 'open-btn', type: 'open'},
+        {id: 'all-btn', type: 'all'}
+    ];
+
+    function showLoadingAnimation() {
+        $('.tetrominos').show(); // Afișează animația
+      }
+      
+    function hideLoadingAnimation() {
+        $('.tetrominos').hide(); // Ascunde animația
+      }
+
+    var closeDataResponse = JSON.parse('{{ closed_prs_data | tojson | safe }}');
+    var allDataResponse = JSON.parse('{{ all_prs_data | tojson | safe }}');
+    var openDataResponse = JSON.parse('{{ open_prs_data | tojson | safe }}');
+
+    function displayPrData(type){
+        hideLoadingAnimation();
+        const container = document.getElementById(`${type}-prs-container`);
+        if (type ==  'close') {
+            if (closeDataResponse.length > 0 && Array.isArray(closeDataResponse)) {
+                closeDataResponse.forEach((pr, index) => {
+                    const prDiv = document.createElement('div');
+                    prDiv.className = `${type}-pr`;
+                    prDiv.innerHTML = `
+                    <div class="text-border">
+                        <h4 style="font-size:20px;"><b>${pr.repository}</b></h4>
+                        <p style="font-size:15px;"><b>Acceptance Rate:</b> ${pr.acceptanceRate || 0}%</p>
+                        <p style="font-size:15px;"><b>Rejection Rate:</b> ${pr.rejectionRate || 0}%</p>
+                        <button class="btn btn-dark" onclick="openModal(${index}, ${pr.acceptanceRate || 0}, ${pr.rejectionRate || 0}, 'close')">More Info</button>
+                        <div id="modal-close-${index}" class="modal">
+                            <div class="modal-content">
+                                <span class="close" onclick="closeModal(${index}, 'close')">&times;</span>
+                                <h5 style="font-size:20px;"><b>${pr.repository}</b></h5>
+                                <div id="pie-chart-close-${index}" style="width: 100%; height: 300px;"></div>
+                                <p style="font-size:15px;"><b>Total number of PRs: </b> ${pr.totalClosed || 0}</p>
+                                <p style="font-size:15px;"><b>Total number of approved PRs: </b> ${pr.totalApproved || 0}</p>
+                                <p style="font-size:15px;"><b>PRs with Changes Requested</b>:</p>
+                                ${pr.changeRequestsDetails.length > 0 ? `<ul>${pr.changeRequestsDetails.map(changedPr => `<li style="font-size:15px;"><b>PR Number:</b> ${changedPr.prNumber} - <b>Changes Requested Count:</b> ${changedPr.changesRequestedCount}</li>`).join('')}</ul>` : '0'}
+                                <p style="font-size:15px;"><b>Total number of review required PRs: </b> ${pr.noActionRequired || 0}</p>
+                                <p style="font-size:15px;"><b>Average time: </b> ${pr.averageTime || 0} </p>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                    container.appendChild(prDiv);
+                });
+            }
+        } else if (type  ==  'all') {
+            if (allDataResponse.length > 0 && Array.isArray(allDataResponse)) {
+                allDataResponse.forEach((pr, index) => {
+                    const prDiv = document.createElement('div');
+                    prDiv.className = `${type}-pr`;
+                    prDiv.innerHTML = `
+                    <div class="text-border">
+                        <h4 style="font-size:20px;"><b>${pr.repository}</b></h4>
+                        <p style="font-size:15px;"><b>Acceptance Rate:</b> ${pr.acceptanceRate || 0}%</p>
+                        <p style="font-size:15px;"><b>Rejection Rate:</b> ${pr.rejectionRate || 0}%</p>
+                        <button class="btn btn-dark" onclick="openModal(${index}, ${pr.acceptanceRate || 0}, ${pr.rejectionRate || 0}, 'all')">More Info</button>
+                        <div id="modal-all-${index}" class="modal">
+                            <div class="modal-content">
+                                <span class="close" onclick="closeModal(${index}, 'all')">&times;</span>
+                                <h5 style="font-size:20px;"><b>${pr.repository}</b></h5>
+                                <div id="pie-chart-all-${index}" style="width: 100%; height: 300px;"></div>
+                                <p style="font-size:15px;"><b>Total number of PRs: </b> ${pr.total || 0}</p>
+                                <p style="font-size:15px;"><b>Total number of approved PRs: </b> ${pr.approved || 0}</p>
+                                <p style="font-size:15px;"><b>PRs with Changes Requested</b>:</p>
+                                ${pr.changeRequestsDetails.length > 0 ? `<ul>${pr.changeRequestsDetails.map(changedPr => `<li style="font-size:15px;"><b>PR Number:</b> ${changedPr.prNumber} - <b>Changes Requested Count:</b> ${changedPr.changesRequestedCount}</li>`).join('')}</ul>` : '0'}
+                                <p style="font-size:15px;"><b>Total number of review required PRs: </b> ${pr.reviewRequired || 0}</p>
+                                <p style="font-size:15px;"><b>Average time: </b> ${pr.averageTime || 0} </p>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                    container.appendChild(prDiv);
+                });
+            }
+        }else if (type  ==  'open') {
+            if (openDataResponse.length >0 && Array.isArray(openDataResponse)) {
+                openDataResponse.forEach((pr, index) => {
+                    const prDiv = document.createElement('div');
+                    prDiv.className = `${type}-pr`;
+                    prDiv.innerHTML = `
+                    <div class="text-border">
+                        <h4 style="font-size:20px;"><b>${pr.repository}</b></h4>
+                        <p style="font-size:15px;"><b>Total number of PRs:</b> ${pr.total || 0}</p>
+                        <p style="font-size:15px;"><b>Total number of PRs without reviews:</b> ${pr.reviewRequired || 0}</p>
+                        <button class="btn btn-dark" onclick="openModal2(${index})">More Info</button>
+                        <div id="modal-open-${index}" class="modal">
+                            <div class="modal-content">
+                                <span class="close" onclick="closeModal2(${index})">&times;</span>
+                                <h5 style="font-size:20px;"><b>${pr.repository}</b></h5>
+                                <p style="font-size:15px;"><b>Total number of PRs: </b> ${pr.total || 0}</p>
+                                <p style="font-size:15px;"><b>Total number of approved PRs: </b> ${pr.approved || 0}</p>
+                                <p style="font-size:15px;"><b>PRs with Changes Requested</b>:</p>
+                                ${pr.changeRequestsDetails.length > 0 ? `<ul>${pr.changeRequestsDetails.map(changedPr => `<li style="font-size:15px;"><b>PR Number:</b> ${changedPr.prNumber} - <b>Changes Requested Count:</b> ${changedPr.changesRequestedCount}</li>`).join('')}</ul>` : '0'}
+                                <p style="font-size:15px;"><b>Total number of review required PRs: </b> ${pr.reviewRequired || 0}</p>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                    container.appendChild(prDiv);
+                });
+            }
+        } 
+    }
+    
+    
+    document.getElementById('close-btn').addEventListener('click', function() {
+        clearPRContainers();
+        showLoadingAnimation();
+        setActiveButton('close-btn');
+        displayPrData('close');
+    });
+    
+    document.getElementById('open-btn').addEventListener('click', function() {
+        clearPRContainers();
+        showLoadingAnimation();
+        setActiveButton('open-btn');
+        displayPrData('open');
+    });
+    
+    document.getElementById('all-btn').addEventListener('click', function() {
+        clearPRContainers();
+        showLoadingAnimation();
+        setActiveButton('all-btn');
+        displayPrData('all');
+   });
+    
+    
+    function initPage() {
+        clearPRContainers();
+        showLoadingAnimation();
+        setActiveButton('close-btn');
+        displayPrData('close');
+    }
+    
+    // Apelarea funcției de inițializare
+    initPage();
+    
+}());
+
+$(function () {
+    $('#datePickerInputStartDate, #datePickerInputEndDate').datepicker({
+        autoclose: true,
+        todayHighlight: true,
+        todayBtn: "linked",
+        format: 'dd-mm-yyyy'
+    }).on('changeDate', function(ev) {
+        $(this).datepicker('hide');
+    });
+
+    // Actualizează DatePicker-ul cu datele setate
+    if ($('#datePickerInputStartDate').val()) {
+        $('#datePickerInputStartDate').datepicker('update', $('#datePickerInputStartDate').val());
+    }
+    if ($('#datePickerInputEndDate').val()) {
+        $('#datePickerInputEndDate').datepicker('update', $('#datePickerInputEndDate').val());
+    }
+});
+
+function backFourteenDays(currentDate) {
+    var date = new Date(currentDate); // Creează un nou obiect Date pentru a nu modifica data originală
+    date.setDate(date.getDate() - 14); // Scade 14 zile din data curentă
+    return date;
+}
+
+var start_date = "{{ start_date }}";
+var end_date = "{{ end_date }}";
+
+//functie de initializare
+$(function () {
+
+    $('#datePickerInputStartDate').datepicker({
+        autoclose: true, 
+        todayHighlight: true, 
+        todayBtn : "linked",
+        format: 'dd-mm-yyyy',
+    }).datepicker('update', start_date);
+
+    $('#datePickerInputEndDate').datepicker({
+        autoclose: true, 
+        todayHighlight: true, 
+        todayBtn : "linked", 
+        format: 'dd-mm-yyyy',
+    }).datepicker('update', end_date);
+});
+
+function openDatePicker(element){
+    $(element).datepicker({
+        autoclose: true, 
+        todayHighlight: true, 
+        todayBtn : "linked", 
+        format: 'dd-mm-yyyy',
+    });
+}
+function openModal(index, acceptanceRate, rejectionRate, type) {
+    var modal = document.getElementById(`modal-${type}-${index}`);
+    modal.style.display = "block";
+    var myChart = echarts.init(document.getElementById(`pie-chart-${type}-${index}`));
+
+    var option = {
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            show: false // Hide the legend
+        },
+        series: [
+            {
+                name: 'PR Rates',
+                type: 'pie',
+                radius: '70%',
+                data: [
+                {
+                    value: acceptanceRate,
+                    name: 'Acceptance Rate',
+                    itemStyle: {
+                        color: 'rgba(0, 0, 255, 0.5)'
+                    }
+                },
+                {
+                    value: rejectionRate,
+                    name: 'Rejection Rate',
+                    itemStyle: {
+                        color: 'rgba(255, 99, 71, 0.5)'
+                    }
+                }
+            ],
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                },
+                label: {
+                    color: 'rgba(0, 0, 0, 0.7)'
+                }
+            }
+        ]
+    };
+
+    myChart.setOption(option);
+}
+
+function closeModal(index, type) {
+    var modal = document.getElementById(`modal-${type}-${index}`);
+    modal.style.display = "none";
+}
+
+function openModal2(index) {
+    var modal = document.getElementById(`modal-open-${index}`);
+    modal.style.display = "block";
+}
+
+function closeModal2(index) {
+    var modal = document.getElementById(`modal-open-${index}`);
+    modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    var modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    });
+}
+</script>
+{% endblock %}
