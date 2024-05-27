@@ -16,8 +16,6 @@ repository = {
     "alexiadraghin/RepoTest4",
     "alexiadraghin/RepoTest5"
 }
-# access_token = "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"
-access_token = "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"
 
 state_filter = {"close", "open", "all"}
 total_prs_all=0

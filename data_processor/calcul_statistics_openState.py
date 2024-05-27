@@ -8,8 +8,6 @@ from models.models import ChangeRequestedPr
 
 
 
-# access_token = "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" 
-access_token="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"
 
 
 def calculate_pr_statistics_open(repository, state, page, access_token, start_date=None, end_date=None):
