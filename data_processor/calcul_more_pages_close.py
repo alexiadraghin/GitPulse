@@ -19,18 +19,14 @@ def calculate_more_pages_close(repo, state, access_token, start_date=None, end_d
 
         if total_closed < per_page:
             break
-
         page += 1
 
     acceptance_rate = (total_pr_approved_closed / totalClosed * 100) if totalClosed > 0 else 0
-    
     total_changes_requested = sum(pr['changesRequestedCount'] for pr in total_pr_with_change_requests_closed)
-
     rejection_rate = (total_changes_requested / totalClosed * 100) if totalClosed > 0 else 0
     average_time = totalTime / total_pr_approved_closed if total_pr_approved_closed > 0 else 0
     avg_time = "{:.2f} days".format(average_time)
     acceptance_rate = "{:.2f}".format(acceptance_rate)
     rejection_rate = "{:.2f}".format(rejection_rate)
-
-
-    return totalClosed + total_pr_without_reviews_closed, total_pr_approved_closed, total_pr_with_change_requests_closed, acceptance_rate, rejection_rate, avg_time, total_pr_without_reviews_closed
+    
+    return totalClosed, total_pr_approved_closed, total_pr_with_change_requests_closed, acceptance_rate, rejection_rate, avg_time, total_pr_without_reviews_closed

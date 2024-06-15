@@ -36,6 +36,15 @@
             </div>
         </div>
     </form>
+    <div class="row justify-content-center" style="margin-top: 50px;">
+        <div class="col-md-8 text-center">
+            <h2>Welcome to GitPulse</h2>
+            <p>
+                GitPulse is a comprehensive tool designed to help developers and project managers analyze pull request statistics in their repositories. 
+                Easily track, review, and manage your pull requests with insightful metrics and visualizations.
+            </p>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -61,12 +70,11 @@ $(function () {
 });
 
 function backFourteenDays(currentDate) {
-    var date = new Date(currentDate); // Creează un nou obiect Date pentru a nu modifica data originală
-    date.setDate(date.getDate() - 14); // Scade 14 zile din data curentă
+    var date = new Date(currentDate); 
+    date.setDate(date.getDate() - 14); 
     return date;
 }
 
-//functie de initializare
 $(function () {
     
     $('#datePickerInputStartDate').datepicker({

@@ -23,7 +23,7 @@
                 </div>
             </div> 
         </div>
-        <button type="submit" class="btn btn-primary">Get Statistics</button>
+        <button type="submit" class="btn btn-primary" style="margin-top: 15px" position="center">Get Statistics</button>
     </form>
       
         <div class="divider" ></div>  
@@ -307,7 +307,6 @@ $(function () {
         $(this).datepicker('hide');
     });
 
-    // Actualizează DatePicker-ul cu datele setate
     if ($('#datePickerInputStartDate').val()) {
         $('#datePickerInputStartDate').datepicker('update', $('#datePickerInputStartDate').val());
     }
@@ -317,8 +316,8 @@ $(function () {
 });
 
 function backFourteenDays(currentDate) {
-    var date = new Date(currentDate); // Creează un nou obiect Date pentru a nu modifica data originală
-    date.setDate(date.getDate() - 14); // Scade 14 zile din data curentă
+    var date = new Date(currentDate); 
+    date.setDate(date.getDate() - 14);
     return date;
 }
 

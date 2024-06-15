@@ -1,21 +1,18 @@
 from data_processor.calcul_more_pages_close import calculate_more_pages_close
 from data_processor.calcul_more_pages_open import calculate_more_pages_open
 from data_processor.calcul_more_pages_all import calculate_more_pages_all
-from models.models import ClosedPrStats, OpenedPrStats, AllPrStats, ChangeRequestedPr
+from models.models import ClosedPrStats, OpenedPrStats, AllPrStats
 
 
 repository = {
-    # "QL-Software-Development/clive-test-tracking-ux",
-    # "QL-Software-Development/CliveQlp",
-    # "QL-Software-Development/CLIVE.QLP.Provider",
-    # "QL-Software-Development/clive-documents",
-    # "QL-Software-Development/Clive.TestTracking"
     "alexiadraghin/RepoTest1", 
     "alexiadraghin/RepoTest2",
     "alexiadraghin/RepoTest3",
     "alexiadraghin/RepoTest4",
     "alexiadraghin/RepoTest5"
 }
+
+access_token = "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"
 
 state_filter = {"close", "open", "all"}
 total_prs_all=0

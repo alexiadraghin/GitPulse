@@ -1,10 +1,8 @@
-from flask import Flask, jsonify, render_template, send_from_directory, request
+from flask import Flask, jsonify, render_template, request
 from flask_restful import Resource, Api, abort
 from gitstats import process_all_prs, get_all_repos_stats, process_closed_prs, process_open_prs
 from datetime import datetime
-from livereload import Server
 from data_processor.date import getTime
-import os
 
 start_date, end_date = getTime()
         
@@ -18,7 +16,7 @@ repository = {
     "alexiadraghin/RepoTest4",
     "alexiadraghin/RepoTest5"
 }
-access_token = "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"
+access_token = "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"
 
 
 def is_status_valid(status):

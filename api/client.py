@@ -1,7 +1,7 @@
 import requests
 
 def list_pr(repository, state, page, access_token):
-    # url = f"https://github.geo.conti.de/api/v3/repos/{repository}/pulls?state={state}&per_page=100&page={page}"
+    
     url = f"https://api.github.com/repos/{repository}/pulls?state={state}&per_page=100&page={page}"
 
     headers = { "Authorization":f"token {access_token}" }
