@@ -2,4 +2,4 @@ Pentru început ne asigurăm că toate bibliotecile necesare sunt instalate conf
 
 Pentru a rula aplicația, se utilizează comanda python app.py. Aceasta va porni serverul local și va face aplicația accesibilă la adresa http://127.0.0.1:5000.
 
-Adresa repository-ului pe GitHub este:
+Adresa repository-ului pe GitHub este: https://github.com/alexiadraghin/GitPulse.git
